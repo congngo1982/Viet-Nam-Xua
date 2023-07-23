@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Page</title>
+</head>
+
+<body>
+    <h1>Welcome NgoNC</h1>
+    <a href="/logout"><button>Log out</button></a>
+    <h2>Account</h2>
+    <form>
+        <input type="text" placeholder="Username" id="Username" required />
+        <input type="text" placeholder="Full Name" id="fullName" />
+        <input type="password" placeholder="Password" id="password" required />
+        <input type="password" placeholder="Confirm Password" id="confirmPassword" required />
+        <button onclick="AddAccount()">REGISTER</button>
+    </form>
+    <form>
+        <input type="text" placeholder="Enter username" id="account" required />
+        <button onclick="CreateStaff()">Create Staff</button>
+    </form>
+
+    <h2>Table</h2>
+    <form>
+        <input type="text" placeholder="Id" id="tableId" required />
+        <input type="number" placeholder="Quantity" id="tableQuantity" />
+        <input type="text" placeholder="Status" id="tableStatus" />
+        <button onclick="AddTable()">Add Table</button>
+    </form>
+
+    <h2>Reservation</h2>
+    <form>
+        <input type="number" placeholder="Id" id="reservationId" required />
+        <input type="datetime-local" placeholder="Create Date" id="createdDate" />
+        <input type="number" placeholder="Status" id="reservationStatus" />
+        <input type="text" placeholder="Table" id="table_id_reservation" />
+        <button onclick="AddReservation()">Add Reservation</button>
+    </form>
+    <button onclick="view()">View</button>
+    <button onclick="filter()">View</button>
+    <script>
+
+        function startTime(date, hours) {
+            var time = date;
+            time.setTime(date.getTime() - hours * 60 * 60 * 1000);
+            return time;
+        }
+
+        function endTime(date, hours) {
+            var time = date;
+            time.setTime(date.getTime() + hours * 60 * 60 * 1000);
+            return time;
+        }
+
+        function OnChangeTime() {
+            var createdDate = document.getElementById("createdDate").value;
+            CallAjax("GET", "http://localhost:8080/table/gettavailable/" + createdDate, "");
+        }
+
+        function AddAccount() {
+            var txtUsername = document.getElementById("Username").value;
+            var txtName = document.getElementById("fullName").value;
+            var txtPassword = document.getElementById("password").value;
+            var txtConfirmPassword = document.getElementById("confirmPassword").value;
+            if (txtPassword != txtConfirmPassword) {
+                alert("Password not Match Confirm Password !!!");
+            } else {
+                var account = {
+                    username: txtUsername,
+                    password: txtPassword,
+                    fullName: txtName,
+                    role: "USER",
+                    status: true
+                }
+                let post = JSON.stringify(account)
+                CallAjax("POST", "http://localhost:8080/account/createaccount", post);
+            }
+        }
+
+        function CreateStaff() {
+            var txtUsername = document.getElementById("account").value;
+            if (txtUsername != null && txtUsername.trim() != "") {
+                CallAjax("POST", "http://localhost:8080/admin/createstaff", txtUsername);
+            } else {
+                alert("Account is Empty !!!");
+            }
+        }
+
+        function AddTable() {
+            var id = document.getElementById("tableId").value;
+            var quantity = document.getElementById("tableQuantity").value;
+            var status = document.getElementById("tableStatus").value;
+            var table = {
+                "id": id,
+                "quantity": quantity,
+                "status": status,
+            }
+            let post = JSON.stringify(table)
+            CallAjax("POST", "http://localhost:8080/table/create", post);
+        }
+
+        function DeleteTable() {
+            var id = document.getElementById("tableId_delete").value;
+            if (id != null && id.trim() != "") {
+                CallAjax("POST", "http://localhost:8080/table/delete", id);
+            } else {
+                alert("Id empty !!!");
+            }
+
+        }
+
+        function AddReservation() {
+            var id = -1;
+            var createdDate = Date.parse(document.getElementById("createdDate").value);
+            var status = document.getElementById("reservationStatus").value;
+            var createdTime = Date.now();
+            var table = document.getElementById("table_id_reservation").value;
+            alert(table);
+            var reservation = {
+                "id": id,
+                "createdDate": createdDate,
+                "status": status,
+                "createdTime": createdTime
+            }
+            let post = JSON.stringify(reservation)
+            CallAjax("POST", "http://localhost:8080/reservation/create/" + table, post);
+        }
+
+        function view() {
+            console.log(document.getElementById("createdDate").value);
+            var startDate = startTime(new Date(document.getElementById("createdDate").value), 3);
+            var date = new Date(startDate);
+            // console.log(`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}${date.getHours()}`);
+            var endDate = endTime(new Date(document.getElementById("createdDate").value), 3);
+            var table = document.getElementById("table_id_reservation").value;
+            console.log(startDate + " - " + endDate + " - " + table);
+            CallAjax("GET", "http://localhost:8080/table/gettavailable/" + document.getElementById("createdDate").value, "");
+        }
+
+        function filter() {
+            console.log(document.getElementById("createdDate").value);
+            var startDate = startTime(new Date(document.getElementById("createdDate").value), 3);
+            var date = new Date(startDate);
+            // console.log(`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}${date.getHours()}`);
+            var endDate = endTime(new Date(document.getElementById("createdDate").value), 3);
+            var table = document.getElementById("table_id_reservation").value;
+            console.log(startDate + " - " + endDate + " - " + table);
+            CallAjax("GET", "http://localhost:8080/table/getfilter?txtDate=" + document.getElementById("createdDate").value + "&txtTable=T05", "");
+        }
+
+        function CallAjax(method, url, requestBody) {
+            let xhr = new XMLHttpRequest()
+            xhr.open(method, url, true)
+            xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+            if (requestBody != null) {
+                xhr.send(requestBody);
+            } else {
+                xhr.send();
+            }
+            xhr.onload = function () {
+                console.log(this.responseText);
+            }
+        }
+    </script>
+</body>
+
+</html>

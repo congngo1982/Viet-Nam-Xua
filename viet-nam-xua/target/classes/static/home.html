@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Booking</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* CSS body */
+        body {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            background-image: url("images/sea.gif");
+            background-size: cover;
+            margin: 0;
+        }
+
+        /* CSS header */
+        header {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: black;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            margin-left: 20px;
+            justify-content: flex-start;
+            color: #413130;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .header-right {
+            margin-right: 40px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .header-right a {
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 20px;
+            color: black;
+        }
+
+        /* CSS trang chính */
+        .booking-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            width: 25%;
+            transform: translate(-50%, -50%);
+            height: 70%;
+            background-color: white;
+            border-radius: 5px;
+        }
+
+        .booking-container h1 {
+            padding-bottom: 30px;
+            color: black;
+            text-align: center;
+            width: 80%;
+        }
+
+        .contact {
+            text-align: center;
+            color: white;
+        }
+
+        .booking-details {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translate(-50%, -50%);
+            overflow: auto;
+            width: 50%;
+            height: 70%;
+            background-color: white;
+            opacity: 0.8;
+            top: 50%;
+            margin-left: 70%;
+            margin-right: auto;
+        }
+
+        .booking-details .item {
+            padding: 10px;
+        }
+
+        /* CSS footer */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+    </style>
+    <script>
+        function GetUser() {
+            document.getElementById("logout").style.display = "none";
+            let xhr = new XMLHttpRequest()
+            xhr.open("GET", "http://localhost:8080/account/getuser", true)
+            xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+            xhr.onload = function () {
+                var result = this.responseText;
+                if (result != null && result != "") {
+                    document.getElementById("login").style.display = "none";
+                    document.getElementById("register").style.display = "none";
+                    document.getElementById("logout").style.display = "block";
+                    document.getElementById("account").style.display = "block";
+                    result = JSON.parse(this.responseText);
+                    user = result;
+                    if (result.role == "USER") {
+                        document.getElementById("account").href = "/userPage.html";
+                    } else {
+                        document.getElementById("account").href = "/staffPage.html";
+                    }
+                    document.getElementById("resername").value = result.fullName;
+                }
+                console.log(result);
+            }
+            xhr.send();
+        }
+    </script>
+</head>
+
+<body onload="GetUser()">
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <h1>Việt Nam Xưa Restaurant</h1>
+        </div>
+        <div class="header-right">
+            <a href="home.html">Home</a>
+            <a id="login" href="login.html">Login</a>
+            <a id="register" href="register.html">Register</a>
+            <a id="logout" href="/logout" style="display: none">Logout</a>
+            <a id="account" href="" style="display: none"><img src="images/account.png" style="width: 30px"></a>
+        </div>
+    </header>
+
+    <!-- Trang chính -->
+    <div class="booking-container">
+        <br>
+        <h2>Đặt bàn trực tuyến</h2> <br>
+        <form>
+            <div class="form-group">
+                <label for="resername">Tên:</label>
+                <input type="text" class="form-control" placeholder="User" id="resername">
+            </div>
+            <div class="form-group">
+                <label for="date">Ngày:</label>
+                <input type="datetime-local" class="form-control" id="date" name="arrive_date" required>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Số người:</label>
+                <select id="quantity" name="quantity" class="custom-select">
+                    <option value="1">1 Người</option>
+                    <option value="2">2 Người</option>
+                    <option value="3">3 Người</option>
+                    <option value="4">4 Người</option>
+                    <option value="5">5 Người</option>
+                    <option value="6">6 Người</option>
+                    <option value="7">7 Người</option>
+                    <option value="8">8 Người</option>
+                    <option value="9">9 Người</option>
+                    <option value="10">10 Người</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="note">Ghi chú:</label>
+                <input type="text" class="form-control" placeholder="Note" id="resernote">
+            </div>
+            <button type="button" class="btn btn-info" onclick="GetAvailableTable()">Tìm</button>
+            <div id="notice" style="display: none;"></div>
+        </form>
+    </div>
+    <div class="booking-details">
+        <table class="table table-hover">
+            <thead style="text-align: center;">
+                <tr>
+                    <th>Table</th>
+                    <th>Quantity</th>
+                    <th>Order</th>
+                </tr>
+            </thead>
+            <tbody style="text-align: center;" id="tbody">
+
+            </tbody>
+        </table>
+    </div>
+    <!-- Footer -->
+    <footer>
+        Copyright &copy; 2023 - Việt Nam Xưa Restaurant
+    </footer>
+
+    <script>
+        function GetAvailableTable() {
+            document.getElementById("notice").style.display = "none";
+            if (document.getElementById("logout").style.display == "none") {
+                // alert("Đăng nhập để tạo đơn !!!");
+                location.replace("/login.html")
+            } else {
+                var quantity = document.getElementById("quantity").value;
+                var date = document.getElementById("date").value;
+                console.log("Date: " + date);
+                var bodyContent = function (name, quantity) {
+                    var content = `
+                <tr>
+                    <td>${name}</td>
+                    <td>${quantity}</td>
+                    <td><button type="button" class="btn btn-info" onclick="AddReservation('${name}')">Order Now</button></td>
+                </tr>`;
+                    return content;
+                }
+                let xhr = new XMLHttpRequest()
+                xhr.open("GET", `http://localhost:8080/table/gettavailable?date=${date}&quantity=${quantity}`, true)
+                xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+                xhr.onload = function () {
+                    var result = this.responseText;
+                    if (result != null && result != "") {
+                        result = JSON.parse(this.responseText);
+                        var tbody = ``;
+                        result.forEach(element => {
+                            tbody += bodyContent(element.id, element.quantity);
+                        });
+                        console.log(result);
+                        document.getElementById("tbody").innerHTML = tbody;
+                    }
+                }
+                xhr.send();
+            }
+
+        }
+
+        async function AddReservation(tableId) {
+            var id = -1;
+            var date = document.getElementById("date").value;
+            var createdDate = Date.parse(document.getElementById("date").value);
+            var quantity = document.getElementById("quantity").value;
+            var note = document.getElementById("resernote").value;
+            // var status = document.getElementById("reservationStatus").value;
+            var createdTime = Date.now();
+            // var table = document.getElementById("table_id_reservation").value;
+            // alert(tableId);
+            var reservation = {
+                "id": id,
+                "createdDate": createdDate,
+                "status": 1,
+                "quantity": quantity,
+                "createdTime": createdTime,
+                "note": note
+            }
+            let post = JSON.stringify(reservation)
+                await CallAjax("POST", "http://localhost:8080/reservation/create/" + tableId, post);
+        }
+        function CallAjax(method, url, requestBody) {
+                let xhr = new XMLHttpRequest()
+            xhr.open(method, url, true)
+            xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+            if (requestBody != null) {
+                xhr.send(requestBody);
+            } else {
+                xhr.send();
+            }
+            xhr.onload = function () {
+                console.log(this.responseText);
+                document.getElementById("notice").innerHTML = this.responseText;
+                document.getElementById("notice").style.display = "block";
+            }
+        }
+    </script>
+</body>
+
+</html>

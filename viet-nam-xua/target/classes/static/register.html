@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Register</title>
+  <meta charset="UTF-8">
+  <style>
+    /* CSS body */
+    body {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      background-image: url("images/sea.gif");
+      background-size: cover;
+      margin: 0;
+    }
+
+    /* CSS header */
+    header {
+      display: flex;
+      background-color: rgba(255, 255, 255, 0.5);
+      color: black;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      margin-left: 20px;
+      justify-content: flex-start;
+      color: #413130;
+      text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+    }
+
+    .header-right {
+      margin-right: 20px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .header-right a {
+      margin-left: 20px;
+      text-decoration: none;
+      font-size: 20px;
+      color: black;
+    }
+
+    /* CSS trang chính */
+    .register-container {
+      width: 400px;
+      padding: 50px;
+      background-color: #ffffff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .register-container input[type="text"],
+    .register-container input[type="email"],
+    .register-container input[type="password"] {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .register-container button[type="submit"] {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      width: 100%;
+      padding: 10px;
+      background-color: #0D487C;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .signup-link a {
+      color: #0D487C;
+    }
+
+    /* CSS footer */
+    footer {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+<!-- Header -->
+<header>
+  <div class="header-left">
+    <h1>Việt Nam Xưa Restaurant</h1>
+  </div>
+  <div class="header-right">
+    <a href="home.html">Home</a>
+    <a href="login.html">Login</a>
+    <a href="register.html">Register</a>
+  </div>
+</header>
+
+<!-- Trang chính -->
+<div class="register-container">
+  <h1>Register</h1>
+  <form id="form">
+    <input id="fullName" type="text" placeholder="Full Name" required/>
+    <input id="email" type="email" placeholder="Email" required/>
+    <input id="phone" type="text" placeholder="Phone number" required/>
+    <input id="username" type="text" placeholder="Username" required/>
+    <input id="password" type="password" placeholder="Password" required/>
+    <input id="confirm" type="password" placeholder="Confirm password" required/>
+    <button type="submit">REGISTER</button>
+  </form>
+  <div class="signup-link">
+    Already a member? <a href="login.html">Login now</a>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  Copyright &copy; 2023 - Việt Nam Xưa Restaurant
+</footer>
+<script>
+    const form = document.getElementById("form");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      var txtName = document.getElementById("fullName").value;
+      var txtEmail = document.getElementById("email").value;
+      var txtPhone = document.getElementById("phone").value;
+      var txtUsername = document.getElementById("username").value;
+      var txtPassword = document.getElementById("password").value;
+      var txtConfirmPassword = document.getElementById("confirm").value;
+      if (txtPassword != txtConfirmPassword) {
+        alert("Password not Match Confirm Password !!!");
+      } else {
+        var account = {
+          username: txtUsername,
+          password: txtPassword,
+          email: txtEmail,
+          phone: txtPhone,
+          fullName: txtName,
+          role: "USER",
+          status: true
+        }
+        let post = JSON.stringify(account)
+        CallAjax("POST", "http://localhost:8080/account/createaccount", post);
+      }
+    });
+
+    function CallAjax(method, url, requestBody) {
+      let xhr = new XMLHttpRequest()
+      xhr.open(method, url, true)
+      xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+      if (requestBody != null) {
+        xhr.send(requestBody);
+      }
+      xhr.onload = function () {
+        if (xhr.status == 201) {
+          console.log("Post successfully created!")
+        } else console.log('Unsuccess');
+        var result = this.responseText;
+        alert(result);
+      }
+    }
+</script>
+</body>
+
+</html>

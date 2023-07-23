@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>User Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* CSS body */
+        body {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            background-image: url("images/sea.gif");
+            background-size: cover;
+            margin: 0;
+        }
+
+        /* CSS header */
+        header {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: black;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            margin-left: 20px;
+            justify-content: flex-start;
+            color: #413130;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .header-right {
+            margin-right: 40px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .header-right a {
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 20px;
+            color: black;
+        }
+
+        /* CSS trang chính */
+        .container {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .menu {
+            background-color: white;
+            border-radius: 10px;
+            width: 400px;
+        }
+
+        .menu a {
+            display: block;
+            padding: 10px 20px;
+            background-color: #f5f5f5;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+
+        .menu a:hover {
+            background-color: #e0e0e0;
+        }
+
+        .content {
+            background-color: #f5f5f5;
+            padding: 20px;
+            margin-left: 20px;
+            width: 600px;
+            height: 400px;
+            overflow: auto;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .content a {
+            display: inline-block;
+            padding: 10px 20px;
+            text-decoration: none;
+            background-color: white;
+            color: #0D487C;
+            border: 2px solid #0D487C;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* CSS footer */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+    </style>
+    <script>
+        function GetUser() {
+            document.getElementById("logout").style.display = "none";
+            let xhr = new XMLHttpRequest()
+            xhr.open("GET", "http://localhost:8080/account/getuser", true)
+            xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+            xhr.onload = function () {
+                var result = this.responseText;
+                if (result != null && result != "") {
+                    document.getElementById("login").style.display = "none";
+                    document.getElementById("register").style.display = "none";
+                    document.getElementById("logout").style.display = "block";
+                    document.getElementById("account").style.display = "block";
+                    result = JSON.parse(this.responseText);
+                    if (result.role == "USER") {
+                        document.getElementById("account").href = "/userPage.html";
+                        document.getElementById("reserUser").value = result.fullName;
+                        document.getElementById("reserPhone").value = result.phone;
+                    } else {
+                        document.getElementById("account").href = "/staffPage.html";
+                    }
+                    document.getElementById("userName").value = result.fullName;
+                    document.getElementById("user-name").innerHTML = result.fullName;
+                    document.getElementById("userPhone").value = result.phone;
+                    document.getElementById("userMail").value = result.email;
+                }
+                console.log(result.role);
+            }
+            xhr.send();
+        }
+
+        function showContent(contentId) {
+            var contents = document.getElementsByClassName("content");
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].style.display = "none";
+            }
+            document.getElementById(contentId).style.display = "block";
+        }
+    </script>
+</head>
+
+<body onload="GetUser()">
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <h1>Việt Nam Xưa Restaurant</h1>
+        </div>
+        <div class="header-right">
+            <a href="home.html">Home</a>
+            <a id="login" href="login.html">Login</a>
+            <a id="register" href="register.html">Register</a>
+            <a id="logout" href="/logout" style="display: none">Logout</a>
+            <a id="account" href="" style="display: none"><img src="images/account.png" style="width: 30px"></a>
+        </div>
+    </header>
+
+    <!-- Trang chính -->
+    <div class="container">
+        <div class="menu">
+            <br>
+            <h3 id="user-name">Nguyễn Văn A</h3>
+            <br>
+            <a href="#personal" onclick="showContent('personal')">Thông tin cá nhân</a>
+            <a href="#current-table" onclick="GetCurrentReservation()">Bàn đang đặt</a>
+            <a href="#booking-history" onclick="GetMyReservation()">Lịch sử đặt bàn</a>
+            <a href="#feedback" onclick="showContent('feedback')">Feedback*</a>
+        </div>
+        <div class="content" id="personal">
+            <!-- Họ và tên: <input id="userName" type="text" value="Staff A" readonly style="color: gray"></br>
+            Số điện thoại: <input id="userPhone" type="text" value="0123 456 789" readonly style="color: gray"></br>
+            Email: <input type="email" id="userMail" value="staff@gmail.com" readonly style="color: gray"></br> -->
+            Họ và tên: <input id="userName" type="text" value="Staff A" readonly style="color: gray"
+                class="form-control"></br>
+            Số điện thoại: <input id="userPhone" type="text" value="0123 456 789" readonly style="color: gray"
+                class="form-control"></br>
+            Email: <input type="email" id="userMail" value="staff@gmail.com" readonly style="color: gray"
+                class="form-control"></br>
+            <a href="#change-password" class="btn btn-primary" onclick="showContent('change-password')">Đổi mật khẩu</a>
+        </div>
+        <div class="content" id="current-table" style="text-align: left;">
+            <div class="form-group">
+                Mã đặt bàn:
+                <input type="text" class="form-control" placeholder="Enter" id="reserId" style="pointer-events: none;">
+            </div>
+            <div class="form-group">
+                Bàn:
+                <input type="text" class="form-control" placeholder="Enter" id="reserTable"
+                    style="pointer-events: none;">
+            </div>
+            <div class="form-group">
+                Số lượng:
+                <input type="text" class="form-control" placeholder="Enter" id="reserQuantity"
+                    style="pointer-events: none;">
+            </div>
+            <div class="form-group">
+                Ngày đặt:
+                <input type="text" class="form-control" placeholder="Enter" id="reserCreatedDate"
+                    style="pointer-events: none;">
+            </div>
+            <div class="form-group">
+                Họ và tên:
+                <input type="text" class="form-control" placeholder="Enter" id="reserUser"
+                    style="pointer-events: none;">
+            </div>
+            <div class="form-group">
+                Số điện thoại:
+                <input type="text" class="form-control" placeholder="Enter" id="reserPhone"
+                    style="pointer-events: none;">
+            </div>
+            <div class="form-group">
+                Ghi chú:
+                <input type="text" class="form-control" placeholder="Enter" id="reserNote"
+                    style="pointer-events: none;">
+            </div>
+
+            <div id="btn">
+                <button class="btn btn-primary" onclick="">Hủy đặt bàn</button>
+            </div>
+
+        </div>
+        <div class="content" id="booking-history">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Bàn</th>
+                        <th>Ngày đặt</th>
+                        <th>Số lượng</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="filter_table_list">
+                    <tr>
+                        <td>John</td>
+                        <td>Doe</td>
+                        <td>john@example.com</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="content" id="feedback">
+
+        </div>
+        <div class="content" id="change-password">
+            <label for="password">Mật khẩu mới:</label>
+            <input type="password" id="password" name="password" required><br>
+
+            <label for="confirm-password">Nhập lại mật khẩu:</label>
+            <input type="password" id="confirm-password" name="confirm-password" required><br>
+
+            <div id="notice"></div>
+
+            <button class="btn btn-primary" onclick="UpdatePassword()">Xác nhận</button>
+            <!-- <input type="submit" value="Xác nhận"> -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        Copyright &copy; 2023 - Việt Nam Xưa Restaurant
+    </footer>
+    <script>
+        // Hiển thị nội dung tab "Thông tin cá nhân" khi trang được tải lần đầu
+        showContent("personal");
+        console.log(new Date().toLocaleDateString());
+
+        function GetMyReservation() {
+            showContent('booking-history')
+            ChangeTbody("http://localhost:8080/reservation/getreservation", "GET");
+        }
+
+        function ChangeTbody(url, method) {
+            var status = ["Đã hủy", "Đang đặt", "Đã hoàn thành"]
+            var bodyContent = function (name, date, note, status) {
+                var content = `<tr>
+            <td>${name}</td>
+            <td>${date}</td>
+            <td>${note}</td>
+            <td>${status}</td>
+          </tr>`;
+                return content;
+            }
+            let xhr = new XMLHttpRequest()
+            xhr.open(method, url, true)
+            xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+            xhr.onload = function () {
+                var result = this.responseText;
+                if (result != null && result != "") {
+                    result = JSON.parse(this.responseText);
+                    var tbody = ``;
+
+                    result.forEach(element => {
+                        var reserDate = (new Date(element.createdDate) + "").split(":");
+                        tbody += bodyContent(element.note.split("`")[0], reserDate[0] + ":" + reserDate[1], element.quantity, status[element.status]);
+                    });
+                    console.log(result);
+                    document.getElementById('filter_table_list').innerHTML = tbody;
+                }
+            }
+            xhr.send();
+        }
+        function GetCurrentReservation() {
+            showContent('current-table');
+            function _getTimeZoneOffsetInMs() {
+                return new Date().getTimezoneOffset() * -60 * 1000;
+            }
+            const d = new Date((Date.now() + _getTimeZoneOffsetInMs()));
+            d.toISOString().slice(0, 19);
+
+            var currentdate = d.toISOString().slice(0, 19);
+            console.log(currentdate);
+            let xhr = new XMLHttpRequest()
+            xhr.open("GET", `http://localhost:8080/reservation/getcurrentreservation/${currentdate}`, true)
+            xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+            xhr.onload = function () {
+                var result = this.responseText;
+                if (result != null && result != "") {
+                    result = JSON.parse(this.responseText);
+                    var reserDate = (new Date(result.createdDate) + "").split(":");
+                    document.getElementById("reserId").value = result.id;
+                    document.getElementById("reserTable").value = result.note.split("`")[0];
+                    document.getElementById("reserQuantity").value = result.quantity;
+                    document.getElementById("reserCreatedDate").value = reserDate[0] + ":" + reserDate[1];
+                    document.getElementById("btn").innerHTML = `<button class="btn btn-primary" onclick="CancelReservation('${result.id}')">Hủy đặt bàn</button>`;
+                    // document.getElementById("reserUser").value = "";
+                    // document.getElementById("reserPhone").value = "";
+                    document.getElementById("reserNote").value = result.note.split("`")[1];
+                }
+                console.log(result);
+            }
+            xhr.send();
+        }
+
+        function CancelReservation(reserId) {
+            let xhr = new XMLHttpRequest()
+            xhr.open("PUT", `http://localhost:8080/reservation/cancelreservation/${reserId}`, true)
+            xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+            xhr.onload = function () {
+                var result = this.responseText;
+
+                console.log(result);
+            }
+            xhr.send();
+            location.reload();
+        }
+
+        function UpdatePassword() {
+            var password = document.getElementById("password").value;
+            var confirm = document.getElementById("confirm-password").value;
+            if (password == confirm) {
+                document.getElementById("notice").innerHTML = "";
+                let xhr = new XMLHttpRequest()
+                xhr.open("PUT", `http://localhost:8080/account/changepassword/${password}`, true)
+                xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+                xhr.onload = function () {
+                    var result = this.responseText;
+
+                    console.log(result);
+                }
+                xhr.send();
+                location.reload();
+            } else {
+                document.getElementById("notice").innerHTML = "Confirm Password must same as Password !!!";
+            }
+        }
+    </script>
+</body>
+
+</html>
